@@ -1,5 +1,7 @@
-using Plots
-using LinearAlgebra
+"""
+    This is a simulation for ideal gas confined in a rectangular geometry.
+"""
+
 using Statistics
 using Profile
 
@@ -61,12 +63,15 @@ function step!(Gas::Matrix{Float64}, N::Int64, dt::Float64, R::Float64, d::Vecto
 end
 
 function main(N::Int64, V::Float64, dt::Float64, R::Float64)
+    f = open(string(pwd(), "/dat.txt"), "w")
     Gas = init(N, V)
     d = [0.0, 0.0]
     vr = [0.0, 0.0]
     for i=1:1000
         step!(Gas, N, dt, R, d, vr)
+        write(f, string(i * dt, ", ", mean(sqrt.(Gas[:, 3] .* Gas[:, 3] .+ Gas[:, 4] .* Gas[:, 4])), "\n"))
     end
+    close(f)
 end
 
 @time main(2000, 500.0, 8e-5, 3e-2)

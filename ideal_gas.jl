@@ -1,5 +1,5 @@
 """
-    This is a simulation for ideal gas confined in a rectangular geometry.
+    This is a simulation for 2D ideal gas confined in a rectangular geometry.
 """
 
 using Statistics
@@ -62,14 +62,23 @@ function step!(Gas::Matrix{Float64}, N::Int64, dt::Float64, R::Float64, d::Vecto
     collision_two!(Gas, N, R, d, vr)
 end
 
+function save2csv(f::IOStream, t::Float64, Gas::Matrix{Float64}, N::Int64)
+    write(f, string(t, ", "))
+    for i=1:N
+        write(f, string(sqrt(Gas[i, 3] * Gas[i, 3] + Gas[i, 4] * Gas[i, 4]), ", "))
+    end
+    write(f, "\n")
+end
+
 function main(N::Int64, V::Float64, dt::Float64, R::Float64)
-    f = open(joinpath(pwd(), "dat.csv"), "w")
     Gas = init(N, V)
     d = [0.0, 0.0]
     vr = [0.0, 0.0]
+    f = open(joinpath(pwd(), "dist.csv"), "w")
+    #write(f, string(0.0, ", ", mean(sqrt.(Gas[:, 3] .* Gas[:, 3] .+ Gas[:, 4] .* Gas[:, 4])), ",\n"))
     for i=1:1000
         step!(Gas, N, dt, R, d, vr)
-        write(f, string(i * dt, ", ", mean(sqrt.(Gas[:, 3] .* Gas[:, 3] .+ Gas[:, 4] .* Gas[:, 4])), ",\n"))
+        save2csv(f, i * dt, Gas, N)
     end
     close(f)
 end

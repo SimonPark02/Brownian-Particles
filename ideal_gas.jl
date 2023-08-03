@@ -2,9 +2,6 @@
     This is a simulation for 2D ideal gas confined in a rectangular geometry.
 """
 
-using Statistics
-using Profile
-
 function init(N::Int64, V::Float64)
     Gas = rand(Float64, (N, 4))
     for i in 1:N
@@ -75,7 +72,6 @@ function main(N::Int64, V::Float64, dt::Float64, R::Float64)
     d = [0.0, 0.0]
     vr = [0.0, 0.0]
     f = open(joinpath(pwd(), "dist.csv"), "w")
-    #write(f, string(0.0, ", ", mean(sqrt.(Gas[:, 3] .* Gas[:, 3] .+ Gas[:, 4] .* Gas[:, 4])), ",\n"))
     for i=1:1000
         step!(Gas, N, dt, R, d, vr)
         save2csv(f, i * dt, Gas, N)
@@ -84,4 +80,3 @@ function main(N::Int64, V::Float64, dt::Float64, R::Float64)
 end
 
 @time main(2000, 500.0, 8e-5, 3e-2)
-#@profview main(1000, 500.0, 8e-5, 3e-2)

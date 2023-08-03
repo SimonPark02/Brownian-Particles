@@ -1,7 +1,7 @@
 """
     This is a simulation for 2D ideal gas confined in a rectangular geometry.
 """
-
+# Testing for git branch
 function init(N::Int64, V::Float64)
     Gas = rand(Float64, (N, 4))
     for i in 1:N

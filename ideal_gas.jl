@@ -63,13 +63,13 @@ function step!(Gas::Matrix{Float64}, N::Int64, dt::Float64, R::Float64, d::Vecto
 end
 
 function main(N::Int64, V::Float64, dt::Float64, R::Float64)
-    f = open(string(pwd(), "/dat.txt"), "w")
+    f = open(joinpath(pwd(), "dat.csv"), "w")
     Gas = init(N, V)
     d = [0.0, 0.0]
     vr = [0.0, 0.0]
     for i=1:1000
         step!(Gas, N, dt, R, d, vr)
-        write(f, string(i * dt, ", ", mean(sqrt.(Gas[:, 3] .* Gas[:, 3] .+ Gas[:, 4] .* Gas[:, 4])), "\n"))
+        write(f, string(i * dt, ", ", mean(sqrt.(Gas[:, 3] .* Gas[:, 3] .+ Gas[:, 4] .* Gas[:, 4])), ",\n"))
     end
     close(f)
 end

@@ -3,7 +3,12 @@
     Author: parkyongjun@snu.ac.kr
 """
 
-function init(N::Int64, V::Float64)
+const N = 2000
+const V = 500.0
+const dt = 8e-5
+const R = 3e-2
+
+function init()
     Gas = rand(Float64, (N, 4))
     for i in 1:N
         v = V * rand()
@@ -14,13 +19,13 @@ function init(N::Int64, V::Float64)
     return Gas
 end
 
-function go!(Gas::Matrix{Float64}, dt::Float64)
+function go!(Gas::Matrix{Float64})
     for i = 1:2
         Gas[:, i] += Gas[:, i + 2] * dt
     end
 end
 
-function collision_wall!(Gas::Matrix{Float64}, N::Int64, R::Float64)
+function collision_wall!(Gas::Matrix{Float64})
     for j in 1:2
         for i in 1:N
             if (abs(Gas[i, j] - 0.5) > (1/2 - R)) && ((Gas[i, j] - 0.5) * Gas[i, j + 2] > 0)
@@ -30,7 +35,7 @@ function collision_wall!(Gas::Matrix{Float64}, N::Int64, R::Float64)
     end
 end
 
-function collision_two!(Gas::Matrix{Float64}, N::Int64, R::Float64, d::Vector{Float64}, vr::Vector{Float64})
+function collision_two!(Gas::Matrix{Float64}, d::Vector{Float64}, vr::Vector{Float64})
     for i in 1:(N-1)
         for j in (i+1):N
             for k in 1:2
@@ -54,13 +59,13 @@ function collision_two!(Gas::Matrix{Float64}, N::Int64, R::Float64, d::Vector{Fl
     end
 end
 
-function step!(Gas::Matrix{Float64}, N::Int64, dt::Float64, R::Float64, d::Vector{Float64}, vr::Vector{Float64})
-    go!(Gas, dt)
-    collision_wall!(Gas, N, R)
-    collision_two!(Gas, N, R, d, vr)
+function step!(Gas::Matrix{Float64}, d::Vector{Float64}, vr::Vector{Float64})
+    go!(Gas)
+    collision_wall!(Gas)
+    collision_two!(Gas, d, vr)
 end
 
-function save2csv(f::IOStream, t::Float64, Gas::Matrix{Float64}, N::Int64)
+function save2csv(f::IOStream, t::Float64, Gas::Matrix{Float64})
     write(f, string(t, ", "))
     for i=1:N
         write(f, string(sqrt(Gas[i, 3] * Gas[i, 3] + Gas[i, 4] * Gas[i, 4]), ", "))
@@ -68,16 +73,16 @@ function save2csv(f::IOStream, t::Float64, Gas::Matrix{Float64}, N::Int64)
     write(f, "\n")
 end
 
-function main(N::Int64, V::Float64, dt::Float64, R::Float64)
-    Gas = init(N, V)
+function main()
+    Gas = init()
     d = [0.0, 0.0]
     vr = [0.0, 0.0]
-    f = open(joinpath(pwd(), "dist.csv"), "w")
+    f = open(joinpath(pwd(), "ideal_gas.csv"), "w")
     for i=1:1000
-        step!(Gas, N, dt, R, d, vr)
-        save2csv(f, i * dt, Gas, N)
+        step!(Gas, d, vr)
+        save2csv(f, i * dt, Gas)
     end
     close(f)
 end
 
-@time main(2000, 500.0, 8e-5, 3e-2)
+@time main()
